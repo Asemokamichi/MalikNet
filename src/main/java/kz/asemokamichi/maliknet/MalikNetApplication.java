@@ -1,4 +1,4 @@
-package com.example.maliknet;
+package kz.asemokamichi.maliknet;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

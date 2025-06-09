@@ -14,14 +14,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Locale;
 
 @Slf4j
 @Component
@@ -30,11 +28,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String BASIC_PREFIX = "Basic ";
     public static final String HEADER_NAME = "Authorization";
-    private static final Locale DEFAULT_LOCALE = new Locale("ru");
 
     private final JwtUtil jwtService;
     private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     protected void doFilterInternal(
@@ -49,9 +45,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (StringUtils.startsWith(authHeader, BASIC_PREFIX)) {
+        if (authHeader.startsWith(BASIC_PREFIX)) {
             handleBasicAuth(authHeader, filterChain, request, response);
-        } else if (StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
+        } else if (authHeader.startsWith(BEARER_PREFIX)) {
             handleBearerToken(authHeader, filterChain, request, response);
         } else {
             filterChain.doFilter(request, response);
@@ -76,7 +72,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (userDetails != null && passwordEncoder.matches(password, userDetails.getPassword())) {
+            if (userDetails != null) {
                 setSecurityContext(userDetails, request);
                 filterChain.doFilter(request, response);
             } else {
@@ -123,14 +119,5 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         context.setAuthentication(authToken);
         SecurityContextHolder.setContext(context);
-    }
-
-    public static Locale getLocaleFromRequest(HttpServletRequest request) {
-        Locale locale = request.getLocale();
-        if (locale == null || locale.getLanguage().isEmpty()) {
-            return DEFAULT_LOCALE;
-        }
-
-        return locale;
     }
 }

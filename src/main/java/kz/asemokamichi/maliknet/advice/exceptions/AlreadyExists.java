@@ -9,6 +9,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class AlreadyExists extends RuntimeException{
     public AlreadyExists(String message) {
         super(message);
-        log.error(message);
     }
 }

@@ -22,6 +22,6 @@ public class AdImage {
     private Ad ad;
 
     @Column(nullable = false)
-    private String imageUrl;
+    private byte[] imageUrl;
 }
 

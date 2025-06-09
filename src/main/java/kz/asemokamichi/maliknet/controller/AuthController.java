@@ -6,15 +6,12 @@ import kz.asemokamichi.maliknet.service.UserService;
 import kz.asemokamichi.maliknet.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -22,17 +19,32 @@ public class AuthController {
     private final JwtUtil jwtService;
 
 
-    @PostMapping
-    public ResponseEntity<?> generateToken() {
-        try {
-            User user = userService.getCurrentUser();
+    @PostMapping("/auth/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        userService.save(user);
 
-            String token = jwtService.generateToken(user);
-            return ResponseEntity.ok(new AuthResponse(token));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad request");
-        }
+        String token = jwtService.generateToken(user);
+
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
+        user = userService.loginUser(user);
+
+        String token = jwtService.generateToken(user);
+
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
+    }
+
+    @GetMapping("/users/me")
+    public ResponseEntity<?> getCurrentUser() {
+        return ResponseEntity.ok(userService.getCurrentUser());
     }
 
 }

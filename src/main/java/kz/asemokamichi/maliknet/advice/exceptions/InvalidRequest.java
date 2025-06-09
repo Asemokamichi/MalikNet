@@ -9,6 +9,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class InvalidRequest  extends RuntimeException{
     public InvalidRequest(String message) {
         super(message);
-        log.error(message);
     }
 }

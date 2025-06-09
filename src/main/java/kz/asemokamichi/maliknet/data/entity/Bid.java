@@ -1,10 +1,13 @@
 package kz.asemokamichi.maliknet.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,6 +25,7 @@ public class Bid {
 
     @ManyToOne
     @JoinColumn(name = "ad_id")
+    @JsonIgnore
     private Ad ad;
 
     @ManyToOne
@@ -31,5 +35,7 @@ public class Bid {
     @Column(nullable = false)
     private BigDecimal amount;
 
+    @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 }
